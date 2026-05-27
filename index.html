@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>二进制密码小游戏</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #fff8f0;
+      --surface: #ffffff;
+      --ink: #2d1f14;
+      --muted: #7a6558;
+      --accent: #ff6b4a;
+      --accent-soft: #ffe8e2;
+      --bit-on: #1a9b8a;
+      --bit-on-glow: rgba(26, 155, 138, 0.35);
+      --bit-off: #e8ddd4;
+      --tens: #4a7cff;
+      --ones: #e85d9a;
+      --shadow: 0 12px 40px rgba(45, 31, 20, 0.08);
+      --radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Noto Sans SC", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 20%, #ffe4c8 0%, transparent 45%),
+        radial-gradient(circle at 90% 80%, #c8f0ea 0%, transparent 40%),
+        var(--bg);
+      line-height: 1.6;
+    }
+
+    .grain {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.7s ease both;
+    }
+
+    h1 {
+      font-family: "ZCOOL KuaiLe", cursive;
+      font-size: clamp(2rem, 6vw, 2.75rem);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .tagline {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 28em;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.75rem;
+      margin-bottom: 1.25rem;
+      animation: fadeUp 0.7s ease both;
+    }
+
+    .card:nth-child(2) { animation-delay: 0.08s; }
+    .card:nth-child(3) { animation-delay: 0.16s; }
+    .card:nth-child(4) { animation-delay: 0.24s; }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    /* Bit input row */
+    .bits-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+
+    .bit-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .bit-group-label {
+      font-family: "ZCOOL KuaiLe", cursive;
+      font-size: 1.1rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+    }
+
+    .bit-group.tens .bit-group-label {
+      background: rgba(74, 124, 255, 0.12);
+      color: var(--tens);
+    }
+
+    .bit-group.ones .bit-group-label {
+      background: rgba(232, 93, 154, 0.12);
+      color: var(--ones);
+    }
+
+    .bits {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .bit-btn {
+      width: 56px;
+      height: 72px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      font-family: "ZCOOL KuaiLe", cursive;
+      font-size: 1.75rem;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+      position: relative;
+    }
+
+    .bit-btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .bit-btn:active {
+      transform: translateY(0) scale(0.97);
+    }
+
+    .bit-btn[data-value="0"] {
+      background: var(--bit-off);
+      color: var(--muted);
+      box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .bit-btn[data-value="1"] {
+      background: linear-gradient(145deg, #22b5a3, var(--bit-on));
+      color: #fff;
+      box-shadow: 0 6px 20px var(--bit-on-glow);
+    }
+
+    .bit-index {
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.6rem;
+      font-family: "Noto Sans SC", sans-serif;
+      font-weight: 600;
+      opacity: 0.5;
+    }
+
+    .divider {
+      width: 2px;
+      align-self: stretch;
+      min-height: 80px;
+      background: linear-gradient(to bottom, transparent, var(--bit-off), transparent);
+      margin: 0 0.25rem;
+    }
+
+    /* Text input fallback */
+    .text-input-row {
+      margin-top: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .text-input-row label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .binary-input {
+      font-family: "ZCOOL KuaiLe", cursive;
+      font-size: 1.5rem;
+      letter-spacing: 0.35em;
+      width: 11em;
+      padding: 0.5rem 0.75rem;
+      border: 2px solid var(--bit-off);
+      border-radius: 12px;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .binary-input:focus {
+      border-color: var(--bit-on);
+    }
+
+    .binary-input.invalid {
+      border-color: var(--accent);
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    /* Conversion steps */
+    .steps {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .step {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      border-radius: 14px;
+      background: var(--bg);
+    }
+
+    .step.tens { border-left: 4px solid var(--tens); }
+    .step.ones { border-left: 4px solid var(--ones); }
+
+    .step-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .step.tens .step-badge { background: rgba(74, 124, 255, 0.15); color: var(--tens); }
+    .step.ones .step-badge { background: rgba(232, 93, 154, 0.15); color: var(--ones); }
+
+    .binary-str {
+      font-family: "ZCOOL KuaiLe", cursive;
+      font-size: 1.35rem;
+      letter-spacing: 0.15em;
+    }
+
+    .arrow {
+      color: var(--muted);
+      font-size: 1.25rem;
+    }
+
+    .decimal {
+      font-family: "ZCOOL KuaiLe", cursive;
+      font-size: 1.5rem;
+      color: var(--bit-on);
+    }
+
+    .place-hint {
+      font-size: 0.85rem;
+      color: var(--muted);
+      width: 100%;
+      margin-top: 0.25rem;
+    }
+
+    /* Result */
+    .result-card {
+      text-align: center;
+      background: linear-gradient(135deg, #fff5eb 0%, #e8faf7 100%);
+    }
+
+    .result-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .result-number {
+      font-family: "ZCOOL KuaiLe", cursive;
+      font-size: clamp(4rem, 15vw, 6rem);
+      line-height: 1;
+      color: var(--accent);
+      text-shadow: 0 4px 0 rgba(255, 107, 74, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .result-number.pop {
+      animation: pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.85); opacity: 0.5; }
+      60% { transform: scale(1.08); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .formula {
+      margin-top: 0.75rem;
+      font-size: 1rem;
+      color: var(--muted);
+    }
+
+    .formula strong {
+      color: var(--ink);
+    }
+
+    /* Actions */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-top: 1.25rem;
+    }
+
+    .btn {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.65rem 1.25rem;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(255, 107, 74, 0.35);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--ink);
+      border: 2px solid var(--bit-off);
+    }
+
+    /* Learn panel */
+    .learn p {
+      margin-bottom: 0.75rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .learn p:last-child {
+      margin-bottom: 0;
+    }
+
+    .learn em {
+      font-style: normal;
+      background: var(--accent-soft);
+      padding: 0.1em 0.35em;
+      border-radius: 4px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .example-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 0.5rem;
+      padding: 0.5rem 0.85rem;
+      background: var(--bg);
+      border-radius: 10px;
+      font-size: 0.9rem;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      animation: fadeUp 0.7s 0.32s ease both;
+    }
+  </style>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="wrap">
+    <header>
+      <h1>二进制密码小游戏</h1>
+      <p class="tagline">输入 6 个 0 或 1，像小侦探一样解开密码——发现二进制如何变成十进制数字！</p>
+    </header>
+
+    <section class="card" aria-labelledby="input-heading">
+      <h2 id="input-heading" class="section-label">输入密码（6 位二进制）</h2>
+      <div class="bits-row" id="bits-ui">
+        <div class="bit-group tens">
+          <span class="bit-group-label">前 3 位 → 十位</span>
+          <div class="bits" id="bits-tens"></div>
+        </div>
+        <div class="divider" aria-hidden="true"></div>
+        <div class="bit-group ones">
+          <span class="bit-group-label">后 3 位 → 个位</span>
+          <div class="bits" id="bits-ones"></div>
+        </div>
+      </div>
+      <div class="text-input-row">
+        <label for="binary-text">或直接输入：</label>
+        <input
+          type="text"
+          id="binary-text"
+          class="binary-input"
+          maxlength="6"
+          inputmode="numeric"
+          autocomplete="off"
+          spellcheck="false"
+          value="100101"
+          aria-describedby="input-hint"
+        />
+      </div>
+      <p id="input-hint" class="place-hint" style="text-align: center; margin-top: 0.75rem;">
+        只能使用 0 和 1，共 6 位
+      </p>
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="btn-decode">解开密码</button>
+        <button type="button" class="btn btn-secondary" id="btn-example">试试示例 100101</button>
+        <button type="button" class="btn btn-secondary" id="btn-random">随机密码</button>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="steps-heading">
+      <h2 id="steps-heading" class="section-label">计算过程</h2>
+      <div class="steps">
+        <div class="step tens">
+          <span class="step-badge">十位</span>
+          <span class="binary-str" id="bin-tens">100</span>
+          <span class="arrow">→</span>
+          <span>二进制转十进制 =</span>
+          <span class="decimal" id="dec-tens">4</span>
+          <p class="place-hint" id="hint-tens">1×4 + 0×2 + 0×1 = 4</p>
+        </div>
+        <div class="step ones">
+          <span class="step-badge">个位</span>
+          <span class="binary-str" id="bin-ones">101</span>
+          <span class="arrow">→</span>
+          <span>二进制转十进制 =</span>
+          <span class="decimal" id="dec-ones">5</span>
+          <p class="place-hint" id="hint-ones">1×4 + 0×2 + 1×1 = 5</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card result-card" aria-live="polite" aria-atomic="true">
+      <p class="result-label">最终答案</p>
+      <div class="result-number" id="result">45</div>
+      <p class="formula" id="formula">
+        合起来：<strong>4</strong> 作为十位，<strong>5</strong> 作为个位 → <strong>45</strong>
+      </p>
+    </section>
+
+    <section class="card learn">
+      <h2 class="section-label">小知识</h2>
+      <p>计算机里只用 <em>0</em> 和 <em>1</em> 两种符号，这叫<strong>二进制</strong>。每多一位，权值就翻倍（从右往左：1、2、4）。</p>
+      <p>这个游戏把 6 位密码拆成两半：前 3 位决定十位数，后 3 位决定个位数，就像两把小小的二进制锁！</p>
+      <div class="example-chip">
+        示例：<code>100101</code> → 十位 <code>100</code>=4，个位 <code>101</code>=5 → <strong>45</strong>
+      </div>
+    </section>
+
+    <footer>拖动开关或输入 6 位数字，即时看到结果</footer>
+  </div>
+
+  <script>
+    const DEFAULT_BITS = "100101";
+    let bits = DEFAULT_BITS.split("");
+
+    const bitsTensEl = document.getElementById("bits-tens");
+    const bitsOnesEl = document.getElementById("bits-ones");
+    const binaryTextEl = document.getElementById("binary-text");
+    const resultEl = document.getElementById("result");
+    const binTensEl = document.getElementById("bin-tens");
+    const binOnesEl = document.getElementById("bin-ones");
+    const decTensEl = document.getElementById("dec-tens");
+    const decOnesEl = document.getElementById("dec-ones");
+    const hintTensEl = document.getElementById("hint-tens");
+    const hintOnesEl = document.getElementById("hint-ones");
+    const formulaEl = document.getElementById("formula");
+
+    function binaryToDecimal(binaryStr) {
+      return parseInt(binaryStr, 2);
+    }
+
+    function expansionHint(binaryStr) {
+      const weights = [4, 2, 1];
+      const parts = binaryStr.split("").map((bit, i) => `${bit}×${weights[i]}`);
+      const sum = binaryToDecimal(binaryStr);
+      return `${parts.join(" + ")} = ${sum}`;
+    }
+
+    function decode(bitsStr) {
+      const tensBin = bitsStr.slice(0, 3);
+      const onesBin = bitsStr.slice(3, 6);
+      const tens = binaryToDecimal(tensBin);
+      const ones = binaryToDecimal(onesBin);
+      const result = tens * 10 + ones;
+      return { tensBin, onesBin, tens, ones, result };
+    }
+
+    function isValidBinary6(str) {
+      return /^[01]{6}$/.test(str);
+    }
+
+    function renderBitButtons() {
+      bitsTensEl.innerHTML = "";
+      bitsOnesEl.innerHTML = "";
+      for (let i = 0; i < 6; i++) {
+        const container = i < 3 ? bitsTensEl : bitsOnesEl;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "bit-btn";
+        btn.dataset.index = String(i);
+        btn.dataset.value = bits[i];
+        btn.setAttribute("aria-label", `第 ${i + 1} 位，当前为 ${bits[i]}，点击切换`);
+        btn.textContent = bits[i];
+        const idx = document.createElement("span");
+        idx.className = "bit-index";
+        idx.textContent = i + 1;
+        btn.appendChild(idx);
+        btn.addEventListener("click", () => toggleBit(i));
+        container.appendChild(btn);
+      }
+    }
+
+    function toggleBit(index) {
+      bits[index] = bits[index] === "0" ? "1" : "0";
+      syncFromBits();
+    }
+
+    function syncFromBits() {
+      const str = bits.join("");
+      binaryTextEl.value = str;
+      binaryTextEl.classList.remove("invalid");
+      updateUI(str, false);
+    }
+
+    function syncFromText() {
+      const raw = binaryTextEl.value.replace(/\s/g, "");
+      if (raw.length > 6) {
+        binaryTextEl.value = raw.slice(0, 6);
+      }
+      const str = binaryTextEl.value;
+      if (str.length === 6 && isValidBinary6(str)) {
+        bits = str.split("");
+        binaryTextEl.classList.remove("invalid");
+        renderBitButtons();
+        updateUI(str, false);
+      } else if (str.length === 6) {
+        binaryTextEl.classList.add("invalid");
+      }
+    }
+
+    function updateUI(bitsStr, animate) {
+      if (!isValidBinary6(bitsStr)) return;
+
+      const { tensBin, onesBin, tens, ones, result } = decode(bitsStr);
+
+      binTensEl.textContent = tensBin;
+      binOnesEl.textContent = onesBin;
+      decTensEl.textContent = tens;
+      decOnesEl.textContent = ones;
+      hintTensEl.textContent = expansionHint(tensBin);
+      hintOnesEl.textContent = expansionHint(onesBin);
+
+      resultEl.textContent = result;
+      formulaEl.innerHTML = `合起来：<strong>${tens}</strong> 作为十位，<strong>${ones}</strong> 作为个位 → <strong>${result}</strong>`;
+
+      if (animate) {
+        resultEl.classList.remove("pop");
+        void resultEl.offsetWidth;
+        resultEl.classList.add("pop");
+      }
+    }
+
+    function setBits(str) {
+      if (!isValidBinary6(str)) return;
+      bits = str.split("");
+      binaryTextEl.value = str;
+      binaryTextEl.classList.remove("invalid");
+      renderBitButtons();
+      updateUI(str, true);
+    }
+
+    binaryTextEl.addEventListener("input", () => {
+      const filtered = binaryTextEl.value.replace(/[^01]/g, "");
+      if (filtered !== binaryTextEl.value) {
+        binaryTextEl.value = filtered;
+      }
+      syncFromText();
+    });
+
+    document.getElementById("btn-decode").addEventListener("click", () => {
+      const str = bits.join("");
+      if (isValidBinary6(str)) {
+        updateUI(str, true);
+      } else {
+        binaryTextEl.classList.add("invalid");
+      }
+    });
+
+    document.getElementById("btn-example").addEventListener("click", () => {
+      setBits("100101");
+    });
+
+    document.getElementById("btn-random").addEventListener("click", () => {
+      let str = "";
+      for (let i = 0; i < 6; i++) {
+        str += Math.random() < 0.5 ? "0" : "1";
+      }
+      setBits(str);
+    });
+
+    renderBitButtons();
+    updateUI(DEFAULT_BITS, false);
+  </script>
+</body>
+</html>
