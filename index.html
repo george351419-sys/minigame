@@ -228,6 +228,11 @@
       transition: border-color 0.2s;
     }
 
+    .binary-input::placeholder {
+      color: var(--bit-off);
+      letter-spacing: 0.35em;
+    }
+
     .binary-input:focus {
       border-color: var(--bit-on);
     }
@@ -241,6 +246,53 @@
       0%, 100% { transform: translateX(0); }
       25% { transform: translateX(-6px); }
       75% { transform: translateX(6px); }
+    }
+
+    /* Calculation section with result first */
+    .calc-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 2px dashed var(--bit-off);
+    }
+
+    .calc-header .section-label {
+      margin-bottom: 0;
+    }
+
+    .result-inline {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.15rem;
+    }
+
+    .result-inline .result-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .result-inline .result-number {
+      font-family: "ZCOOL KuaiLe", cursive;
+      font-size: clamp(2.5rem, 10vw, 3.5rem);
+      line-height: 1;
+      color: var(--accent);
+      text-shadow: 0 3px 0 rgba(255, 107, 74, 0.2);
+    }
+
+    .result-inline .result-number.pop {
+      animation: pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .result-inline .result-number.empty {
+      color: var(--bit-off);
+      text-shadow: none;
+      font-size: 2rem;
     }
 
     /* Conversion steps */
@@ -297,31 +349,6 @@
       margin-top: 0.25rem;
     }
 
-    /* Result */
-    .result-card {
-      text-align: center;
-      background: linear-gradient(135deg, #fff5eb 0%, #e8faf7 100%);
-    }
-
-    .result-label {
-      font-size: 0.9rem;
-      color: var(--muted);
-      margin-bottom: 0.5rem;
-    }
-
-    .result-number {
-      font-family: "ZCOOL KuaiLe", cursive;
-      font-size: clamp(4rem, 15vw, 6rem);
-      line-height: 1;
-      color: var(--accent);
-      text-shadow: 0 4px 0 rgba(255, 107, 74, 0.2);
-      transition: transform 0.3s ease;
-    }
-
-    .result-number.pop {
-      animation: pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
     @keyframes pop {
       0% { transform: scale(0.85); opacity: 0.5; }
       60% { transform: scale(1.08); }
@@ -329,9 +356,10 @@
     }
 
     .formula {
-      margin-top: 0.75rem;
+      margin-top: 1rem;
       font-size: 1rem;
       color: var(--muted);
+      text-align: center;
     }
 
     .formula strong {
@@ -445,7 +473,8 @@
           inputmode="numeric"
           autocomplete="off"
           spellcheck="false"
-          value="100101"
+          value=""
+          placeholder="______"
           aria-describedby="input-hint"
         />
       </div>
@@ -454,38 +483,38 @@
       </p>
       <div class="actions">
         <button type="button" class="btn btn-primary" id="btn-decode">解开密码</button>
-        <button type="button" class="btn btn-secondary" id="btn-example">试试示例 100101</button>
         <button type="button" class="btn btn-secondary" id="btn-random">随机密码</button>
       </div>
     </section>
 
-    <section class="card" aria-labelledby="steps-heading">
-      <h2 id="steps-heading" class="section-label">计算过程</h2>
+    <section class="card" aria-labelledby="steps-heading" aria-live="polite" aria-atomic="true">
+      <div class="calc-header">
+        <h2 id="steps-heading" class="section-label">计算过程</h2>
+        <div class="result-inline">
+          <p class="result-label">最终答案</p>
+          <div class="result-number" id="result">77</div>
+        </div>
+      </div>
       <div class="steps">
         <div class="step tens">
           <span class="step-badge">十位</span>
-          <span class="binary-str" id="bin-tens">100</span>
+          <span class="binary-str" id="bin-tens">111</span>
           <span class="arrow">→</span>
           <span>二进制转十进制 =</span>
-          <span class="decimal" id="dec-tens">4</span>
-          <p class="place-hint" id="hint-tens">1×4 + 0×2 + 0×1 = 4</p>
+          <span class="decimal" id="dec-tens">7</span>
+          <p class="place-hint" id="hint-tens">1×4 + 1×2 + 1×1 = 7</p>
         </div>
         <div class="step ones">
           <span class="step-badge">个位</span>
-          <span class="binary-str" id="bin-ones">101</span>
+          <span class="binary-str" id="bin-ones">111</span>
           <span class="arrow">→</span>
           <span>二进制转十进制 =</span>
-          <span class="decimal" id="dec-ones">5</span>
-          <p class="place-hint" id="hint-ones">1×4 + 0×2 + 1×1 = 5</p>
+          <span class="decimal" id="dec-ones">7</span>
+          <p class="place-hint" id="hint-ones">1×4 + 1×2 + 1×1 = 7</p>
         </div>
       </div>
-    </section>
-
-    <section class="card result-card" aria-live="polite" aria-atomic="true">
-      <p class="result-label">最终答案</p>
-      <div class="result-number" id="result">45</div>
       <p class="formula" id="formula">
-        合起来：<strong>4</strong> 作为十位，<strong>5</strong> 作为个位 → <strong>45</strong>
+        合起来：<strong>7</strong> 作为十位，<strong>7</strong> 作为个位 → <strong>77</strong>
       </p>
     </section>
 
@@ -502,7 +531,7 @@
   </div>
 
   <script>
-    const DEFAULT_BITS = "100101";
+    const DEFAULT_BITS = "111111";
     let bits = DEFAULT_BITS.split("");
 
     const bitsTensEl = document.getElementById("bits-tens");
@@ -563,15 +592,20 @@
     }
 
     function toggleBit(index) {
-      bits[index] = bits[index] === "0" ? "1" : "0";
-      syncFromBits();
+      bits[index] = bits[index] === "1" ? "0" : "1";
+      renderBitButtons();
+      syncFromBits(true);
     }
 
-    function syncFromBits() {
-      const str = bits.join("");
-      binaryTextEl.value = str;
+    function getActiveBitsStr() {
+      const typed = binaryTextEl.value.replace(/\s/g, "");
+      if (typed.length === 6 && isValidBinary6(typed)) return typed;
+      return bits.join("");
+    }
+
+    function syncFromBits(animate) {
       binaryTextEl.classList.remove("invalid");
-      updateUI(str, false);
+      updateUI(bits.join(""), animate);
     }
 
     function syncFromText() {
@@ -579,7 +613,12 @@
       if (raw.length > 6) {
         binaryTextEl.value = raw.slice(0, 6);
       }
-      const str = binaryTextEl.value;
+      const str = binaryTextEl.value.replace(/\s/g, "");
+      if (str.length === 0) {
+        binaryTextEl.classList.remove("invalid");
+        syncFromBits(false);
+        return;
+      }
       if (str.length === 6 && isValidBinary6(str)) {
         bits = str.split("");
         binaryTextEl.classList.remove("invalid");
@@ -612,10 +651,10 @@
       }
     }
 
-    function setBits(str) {
+    function setBits(str, fillInput) {
       if (!isValidBinary6(str)) return;
       bits = str.split("");
-      binaryTextEl.value = str;
+      if (fillInput) binaryTextEl.value = str;
       binaryTextEl.classList.remove("invalid");
       renderBitButtons();
       updateUI(str, true);
@@ -630,16 +669,16 @@
     });
 
     document.getElementById("btn-decode").addEventListener("click", () => {
-      const str = bits.join("");
+      const str = getActiveBitsStr();
       if (isValidBinary6(str)) {
+        if (binaryTextEl.value.replace(/\s/g, "").length === 6) {
+          bits = str.split("");
+          renderBitButtons();
+        }
         updateUI(str, true);
       } else {
         binaryTextEl.classList.add("invalid");
       }
-    });
-
-    document.getElementById("btn-example").addEventListener("click", () => {
-      setBits("100101");
     });
 
     document.getElementById("btn-random").addEventListener("click", () => {
@@ -647,7 +686,7 @@
       for (let i = 0; i < 6; i++) {
         str += Math.random() < 0.5 ? "0" : "1";
       }
-      setBits(str);
+      setBits(str, true);
     });
 
     renderBitButtons();
