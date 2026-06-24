@@ -472,7 +472,6 @@
       </div>
       
       <div class="actions">
-        <button type="button" class="btn btn-secondary" id="btn-random">摇竹签</button>
         <button type="button" class="btn btn-primary" id="btn-decode">预言幸运数字</button>
       </div>
     </section>
@@ -573,15 +572,6 @@
         resultCardEl.style.display = "block";
         updateUI(str, true);
       }
-    });
-
-    document.getElementById("btn-random").addEventListener("click", () => {
-      let str = "";
-      for (let i = 0; i < 6; i++) {
-        str += Math.random() < 0.5 ? "0" : "1";
-      }
-      resultCardEl.style.display = "none";
-      setBits(str);
     });
 
     renderBitButtons();
