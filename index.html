@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>二进制密码小游戏</title>
+  <title>幸运数字预言</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -170,9 +170,9 @@
     }
 
     .bit-btn[data-value="0"] {
-      background: var(--bit-off);
-      color: var(--muted);
-      box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.6);
+      background: #ff4757;
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(255, 71, 87, 0.35);
     }
 
     .bit-btn[data-value="1"] {
@@ -446,88 +446,45 @@
   <div class="grain" aria-hidden="true"></div>
   <div class="wrap">
     <header>
-      <h1>二进制密码小游戏</h1>
-      <p class="tagline">输入 6 个 0 或 1，像小侦探一样解开密码——发现二进制如何变成十进制数字！</p>
+      <h1>幸运数字预言</h1>
+      <p class="tagline">欢迎来到幸运数字预言，摇出竹签后，任选一个竹签上你喜欢的数字，我能预言出你选中的数字哦！</p>
     </header>
 
+    <section class="card">
+      <h2 class="section-label">玩法说明</h2>
+      <p style="color: var(--muted); font-size: 0.95rem; line-height: 1.8;">
+        选择竹签上的一个数字，偷偷改掉它对应的形状，不要更改其他数字的形状，然后依次点选六个形状，例：■○○■○■。<br><br>
+        然后点击"预言幸运数字"就能看到结果！
+      </p>
+    </section>
+
     <section class="card" aria-labelledby="input-heading">
-      <h2 id="input-heading" class="section-label">输入密码（6 位二进制）</h2>
+      <h2 id="input-heading" class="section-label">选择形状</h2>
+      <p style="color: var(--muted); font-size: 0.85rem; text-align: center; margin-bottom: 1rem;">点击形状切换</p>
       <div class="bits-row" id="bits-ui">
         <div class="bit-group tens">
-          <span class="bit-group-label">前 3 位 → 十位</span>
           <div class="bits" id="bits-tens"></div>
         </div>
         <div class="divider" aria-hidden="true"></div>
         <div class="bit-group ones">
-          <span class="bit-group-label">后 3 位 → 个位</span>
           <div class="bits" id="bits-ones"></div>
         </div>
       </div>
-      <div class="text-input-row">
-        <label for="binary-text">或直接输入：</label>
-        <input
-          type="text"
-          id="binary-text"
-          class="binary-input"
-          maxlength="6"
-          inputmode="numeric"
-          autocomplete="off"
-          spellcheck="false"
-          value=""
-          placeholder="______"
-          aria-describedby="input-hint"
-        />
-      </div>
-      <p id="input-hint" class="place-hint" style="text-align: center; margin-top: 0.75rem;">
-        只能使用 0 和 1，共 6 位
-      </p>
+      
       <div class="actions">
-        <button type="button" class="btn btn-secondary" id="btn-random">随机密码</button>
-        <button type="button" class="btn btn-primary" id="btn-decode">解开密码</button>
+        <button type="button" class="btn btn-secondary" id="btn-random">摇竹签</button>
+        <button type="button" class="btn btn-primary" id="btn-decode">预言幸运数字</button>
       </div>
     </section>
 
-    <section class="card" aria-labelledby="steps-heading" aria-live="polite" aria-atomic="true">
-      <div class="calc-header">
-        <h2 id="steps-heading" class="section-label">计算过程</h2>
-        <div class="result-inline">
-          <p class="result-label">最终答案</p>
-          <div class="result-number" id="result">77</div>
-        </div>
-      </div>
-      <div class="steps">
-        <div class="step tens">
-          <span class="step-badge">十位</span>
-          <span class="binary-str" id="bin-tens">111</span>
-          <span class="arrow">→</span>
-          <span>二进制转十进制 =</span>
-          <span class="decimal" id="dec-tens">7</span>
-          <p class="place-hint" id="hint-tens">1×4 + 1×2 + 1×1 = 7</p>
-        </div>
-        <div class="step ones">
-          <span class="step-badge">个位</span>
-          <span class="binary-str" id="bin-ones">111</span>
-          <span class="arrow">→</span>
-          <span>二进制转十进制 =</span>
-          <span class="decimal" id="dec-ones">7</span>
-          <p class="place-hint" id="hint-ones">1×4 + 1×2 + 1×1 = 7</p>
-        </div>
-      </div>
-      <p class="formula" id="formula">
-        合起来：<strong>7</strong> 作为十位，<strong>7</strong> 作为个位 → <strong>77</strong>
-      </p>
-    </section>
-
-    <section class="card learn">
-      <h2 class="section-label">小知识</h2>
-      <p>计算机里只用 <em>0</em> 和 <em>1</em> 两种符号，这叫<strong>二进制</strong>。每多一位，权值就翻倍（从右往左：1、2、4）。</p>
-      <p>这个游戏把 6 位密码拆成两半：前 3 位决定十位数，后 3 位决定个位数，就像两把小小的二进制锁！</p>
-      <div class="example-chip">
-        示例：<code>100101</code> → 十位 <code>100</code>=4，个位 <code>101</code>=5 → <strong>45</strong>
+    <section class="card" id="result-card" aria-labelledby="result-heading" aria-live="polite" aria-atomic="true" style="display: none;">
+      <div class="result-inline" style="justify-content: center; align-items: center;">
+        <p class="result-label">预言结果</p>
+        <div class="result-number" id="result">77</div>
       </div>
     </section>
 
-    <footer>拖动开关或输入 6 位数字，即时看到结果</footer>
+    
   </div>
 
   <script>
@@ -536,34 +493,20 @@
 
     const bitsTensEl = document.getElementById("bits-tens");
     const bitsOnesEl = document.getElementById("bits-ones");
-    const binaryTextEl = document.getElementById("binary-text");
     const resultEl = document.getElementById("result");
-    const binTensEl = document.getElementById("bin-tens");
-    const binOnesEl = document.getElementById("bin-ones");
-    const decTensEl = document.getElementById("dec-tens");
-    const decOnesEl = document.getElementById("dec-ones");
-    const hintTensEl = document.getElementById("hint-tens");
-    const hintOnesEl = document.getElementById("hint-ones");
-    const formulaEl = document.getElementById("formula");
+    const resultCardEl = document.getElementById("result-card");
 
-    function binaryToDecimal(binaryStr) {
-      return parseInt(binaryStr, 2);
-    }
-
-    function expansionHint(binaryStr) {
-      const weights = [4, 2, 1];
-      const parts = binaryStr.split("").map((bit, i) => `${bit}×${weights[i]}`);
-      const sum = binaryToDecimal(binaryStr);
-      return `${parts.join(" + ")} = ${sum}`;
+    function bitToSymbol(bit) {
+      return bit === "1" ? "■" : "○";
     }
 
     function decode(bitsStr) {
       const tensBin = bitsStr.slice(0, 3);
       const onesBin = bitsStr.slice(3, 6);
-      const tens = binaryToDecimal(tensBin);
-      const ones = binaryToDecimal(onesBin);
+      const tens = parseInt(tensBin, 2);
+      const ones = parseInt(onesBin, 2);
       const result = tens * 10 + ones;
-      return { tensBin, onesBin, tens, ones, result };
+      return { result };
     }
 
     function isValidBinary6(str) {
@@ -580,8 +523,8 @@
         btn.className = "bit-btn";
         btn.dataset.index = String(i);
         btn.dataset.value = bits[i];
-        btn.setAttribute("aria-label", `第 ${i + 1} 位，当前为 ${bits[i]}，点击切换`);
-        btn.textContent = bits[i];
+        btn.setAttribute("aria-label", `第 ${i + 1} 位，当前为 ${bits[i] === "1" ? "方" : "圆"}，点击切换`);
+        btn.textContent = bitToSymbol(bits[i]);
         const idx = document.createElement("span");
         idx.className = "bit-index";
         idx.textContent = i + 1;
@@ -594,55 +537,22 @@
     function toggleBit(index) {
       bits[index] = bits[index] === "1" ? "0" : "1";
       renderBitButtons();
-      syncFromBits(true);
     }
 
     function getActiveBitsStr() {
-      const typed = binaryTextEl.value.replace(/\s/g, "");
-      if (typed.length === 6 && isValidBinary6(typed)) return typed;
       return bits.join("");
     }
 
     function syncFromBits(animate) {
-      binaryTextEl.classList.remove("invalid");
       updateUI(bits.join(""), animate);
-    }
-
-    function syncFromText() {
-      const raw = binaryTextEl.value.replace(/\s/g, "");
-      if (raw.length > 6) {
-        binaryTextEl.value = raw.slice(0, 6);
-      }
-      const str = binaryTextEl.value.replace(/\s/g, "");
-      if (str.length === 0) {
-        binaryTextEl.classList.remove("invalid");
-        syncFromBits(false);
-        return;
-      }
-      if (str.length === 6 && isValidBinary6(str)) {
-        bits = str.split("");
-        binaryTextEl.classList.remove("invalid");
-        renderBitButtons();
-        updateUI(str, false);
-      } else if (str.length === 6) {
-        binaryTextEl.classList.add("invalid");
-      }
     }
 
     function updateUI(bitsStr, animate) {
       if (!isValidBinary6(bitsStr)) return;
 
-      const { tensBin, onesBin, tens, ones, result } = decode(bitsStr);
-
-      binTensEl.textContent = tensBin;
-      binOnesEl.textContent = onesBin;
-      decTensEl.textContent = tens;
-      decOnesEl.textContent = ones;
-      hintTensEl.textContent = expansionHint(tensBin);
-      hintOnesEl.textContent = expansionHint(onesBin);
+      const { result } = decode(bitsStr);
 
       resultEl.textContent = result;
-      formulaEl.innerHTML = `合起来：<strong>${tens}</strong> 作为十位，<strong>${ones}</strong> 作为个位 → <strong>${result}</strong>`;
 
       if (animate) {
         resultEl.classList.remove("pop");
@@ -651,33 +561,17 @@
       }
     }
 
-    function setBits(str, fillInput) {
+    function setBits(str) {
       if (!isValidBinary6(str)) return;
       bits = str.split("");
-      if (fillInput) binaryTextEl.value = str;
-      binaryTextEl.classList.remove("invalid");
       renderBitButtons();
-      updateUI(str, true);
     }
-
-    binaryTextEl.addEventListener("input", () => {
-      const filtered = binaryTextEl.value.replace(/[^01]/g, "");
-      if (filtered !== binaryTextEl.value) {
-        binaryTextEl.value = filtered;
-      }
-      syncFromText();
-    });
 
     document.getElementById("btn-decode").addEventListener("click", () => {
       const str = getActiveBitsStr();
       if (isValidBinary6(str)) {
-        if (binaryTextEl.value.replace(/\s/g, "").length === 6) {
-          bits = str.split("");
-          renderBitButtons();
-        }
+        resultCardEl.style.display = "block";
         updateUI(str, true);
-      } else {
-        binaryTextEl.classList.add("invalid");
       }
     });
 
@@ -686,11 +580,11 @@
       for (let i = 0; i < 6; i++) {
         str += Math.random() < 0.5 ? "0" : "1";
       }
-      setBits(str, true);
+      resultCardEl.style.display = "none";
+      setBits(str);
     });
 
     renderBitButtons();
-    updateUI(DEFAULT_BITS, false);
   </script>
 </body>
 </html>
